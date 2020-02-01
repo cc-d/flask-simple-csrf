@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import config
 import sys
 from werkzeug.security import generate_password_hash, check_password_hash
