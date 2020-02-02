@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import config
+from flask_simple_csrf import config
 import sys
 from werkzeug.security import generate_password_hash, check_password_hash
 from argparse import ArgumentParser
