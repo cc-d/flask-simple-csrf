@@ -9,7 +9,14 @@ This package is intended to assign a unique CSRF string per each form submit per
 Second, you probably want to add somthing like this to the top of your code:
 
 ```
-import flask_simple_csrf as CSRF
+from flask_simple_csrf import CSRF
+
+#app.config should have an attribute that looks something like this
+#CSRF_CONFIG = {
+#    'SECRET_CSRF_KEY': 'changeme-40-50-characters-long',
+#}
+
+CSRF = CSRF(config=config.CSRF_CONFIG)
 app = CSRF.init_app(app)
 
 @app.before_request

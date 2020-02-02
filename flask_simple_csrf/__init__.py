@@ -1,41 +1,42 @@
 #!/usr/bin/env python3
-from flask_simple_csrf import config
+from flask_simple_csrf.config import config
 import sys
 from werkzeug.security import generate_password_hash, check_password_hash
 from argparse import ArgumentParser
 
 
-def create(client_key, server_key=config.SECRET_CSRF_KEY):
-    token = generate_password_hash(client_key + server_key,
-                                   method=config.METHOD,
-                                   salt_length=config.SALT_LENGTH)
-    token = token.replace(config.METHOD + '$', '')
-    return token
+class CSRF:
+    def __init__(self, default_config=config, config=config):
+        self.config = default_config
+        for key in config.keys():
+            self.config[key] = config[key]
+
+    def create(self, client_key, server_key=config['SECRET_CSRF_KEY']):
+        token = generate_password_hash(client_key + server_key,
+                                       method=config['METHOD'],
+                                       salt_length=config['SALT_LENGTH'])
+        token = token.replace(config['METHOD'] + '$', '')
+        return token
 
 
-def verify(client_key, csrf_token,
-                      server_key=config.SECRET_CSRF_KEY):
-    return check_password_hash(config.METHOD + '$' + csrf_token,
-                               client_key + server_key)
+    def verify(self, client_key, csrf_token,
+               server_key=config['SECRET_CSRF_KEY']):
+        return check_password_hash(config['METHOD'] + '$' + csrf_token,
+                                   client_key + server_key)
 
 
-def csrf_html(csrf_token, elem_name=config.HTML_ELEM_NAME):
-    return '<input type="hidden" value="%s" name="%s">' % (csrf_token,
-                                                           elem_name)
+    def csrf_html(self, csrf_token, elem_name=config['HTML_ELEM_NAME']):
+        return '<input type="hidden" value="%s" name="%s">' % (csrf_token,
+                                                               elem_name)
 
 
-def init_app(app):
-    app.jinja_env.globals.update(csrf_html=csrf_html)
+    def init_app(self, app):
+        app.jinja_env.globals.update(csrf_html=self.csrf_html)
 
-    if 'SECRET_CSRF_KEY' in app.config.keys():
-        config.SECRET_CSRF_KEY = app.config['SECRET_CSRF_KEY']
-    else:
-        print('SECRET_CSRF_KEY does not exist in app config.' +
-              'You should not use the default.')
+        return app
 
-
-    return app
-
+def init_CSRF():
+    return CSRF()
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Simple CSRF tokens')
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     if len(args.action) != 1:
         raise Exception('Invalid amount of positional aguments. ' +
                         'Must be "create" or "verify".')
-    elif args.action[0] not in ['create','verify']:
+    elif args.action[0] not in ['create', 'verify']:
         raise Exception('Invalid acion. ' +
                         'Valid actions are "create" and verify"')
 
@@ -75,15 +76,17 @@ if __name__ == '__main__':
     else:
         client_key = args.client_key
 
+    CSRF = CSRF()
+
     if args.action[0] == 'create':
-        csrf_token = create(client_key=client_key)
+        csrf_token = CSRF.create(client_key=client_key)
         if args.token_only:
             print(csrf_token)
             sys.exit()
         else:
-            print(csrf_html(csrf_token))
+            print(CSRF.csrf_html(csrf_token))
     else:
         if args.csrf_token is None:
             raise Exception('Must include csrf token.')
         else:
-            print(verify(client_key, args.csrf_token))
+            print(CSRF.verify(client_key, args.csrf_token))
