@@ -2,7 +2,7 @@
 import os
 from setuptools import setup, find_packages
 
-LOCATION = os.path.dirname(os.path.realpath(__file__)) + '/'
+LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), '/')
 
 with open(LOCATION + 'README.md', 'r') as r:
     README = r.read()
