@@ -3,11 +3,11 @@ import os
 import sys
 
 LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-LIB = os.path.join(LIB, '../simple_csrf/')
+LIB = os.path.join(LIB, '../flask_simple_csrf/')
 
 sys.path.append(LIB)
 
-from simple_csrf import *
+from flask_simple_csrf import *
 
 import re
 
