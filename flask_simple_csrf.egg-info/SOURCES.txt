@@ -1,0 +1,9 @@
+README.md
+setup.py
+flask_simple_csrf/__init__.py
+flask_simple_csrf/config.py
+flask_simple_csrf.egg-info/PKG-INFO
+flask_simple_csrf.egg-info/SOURCES.txt
+flask_simple_csrf.egg-info/dependency_links.txt
+flask_simple_csrf.egg-info/requires.txt
+flask_simple_csrf.egg-info/top_level.txt
