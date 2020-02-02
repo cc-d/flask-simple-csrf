@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from argparse import ArgumentParser
 
 
-def create_csrf_token(client_key, server_key=config.SECRET_CSRF_KEY):
+def create(client_key, server_key=config.SECRET_CSRF_KEY):
     token = generate_password_hash(client_key + server_key,
                                    method=config.METHOD,
                                    salt_length=config.SALT_LENGTH)
@@ -13,15 +13,28 @@ def create_csrf_token(client_key, server_key=config.SECRET_CSRF_KEY):
     return token
 
 
-def verify_csrf_token(client_key, csrf_token,
+def verify(client_key, csrf_token,
                       server_key=config.SECRET_CSRF_KEY):
     return check_password_hash(config.METHOD + '$' + csrf_token,
                                client_key + server_key)
 
 
-def html_input(csrf_token, elem_name=config.HTML_ELEM_NAME):
+def csrf_html(csrf_token, elem_name=config.HTML_ELEM_NAME):
     return '<input type="hidden" value="%s" name="%s">' % (csrf_token,
                                                            elem_name)
+
+
+def init_app(app):
+    app.jinja_env.globals.update(csrf_html=csrf_html)
+
+    if 'SECRET_CSRF_KEY' in app.config.keys():
+        config.SECRET_CSRF_KEY = app.config['SECRET_CSRF_KEY']
+    else:
+        print('SECRET_CSRF_KEY does not exist in app config.' +
+              'You should not use the default.')
+
+
+    return app
 
 
 if __name__ == '__main__':
@@ -63,14 +76,14 @@ if __name__ == '__main__':
         client_key = args.client_key
 
     if args.action[0] == 'create':
-        csrf_token = create_csrf_token(client_key=client_key)
+        csrf_token = create(client_key=client_key)
         if args.token_only:
             print(csrf_token)
             sys.exit()
         else:
-            print(html_input(csrf_token))
+            print(csrf_html(csrf_token))
     else:
         if args.csrf_token is None:
             raise Exception('Must include csrf token.')
         else:
-            print(verify_csrf_token(client_key, args.csrf_token))
+            print(verify(client_key, args.csrf_token))

@@ -14,18 +14,18 @@ import re
 
 def main():
     client_key = 'hello'
-    csrf_token = create_csrf_token(client_key)
+    csrf_token = create(client_key)
 
-    assert csrf_token != create_csrf_token('other'), 'duplicate token gen'
+    assert csrf_token != create('other'), 'duplicate token gen'
 
-    html = html_input(csrf_token)
+    html = csrf_html(csrf_token)
     reg = re.findall(r'<input type="hidden" (value=".*") (name=".*")>', html)
 
     assert len(reg) == 1, 'invalid html element'
     assert 'value="%s"' % csrf_token in reg[0], 'html element value error'
 
-    assert verify_csrf_token(client_key, csrf_token) is True, 'correct token returned False'
-    assert verify_csrf_token(client_key + '1', csrf_token) is False, 'Incorrect Token returned True'
+    assert verify(client_key, csrf_token) is True, 'correct token returned False'
+    assert verify(client_key + '1', csrf_token) is False, 'Incorrect Token returned True'
 
     print('Tests complete.')
 
