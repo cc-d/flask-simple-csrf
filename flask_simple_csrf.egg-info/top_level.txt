@@ -1,1 +1,0 @@
-flask_simple_csrf
