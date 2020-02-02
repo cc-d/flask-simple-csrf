@@ -11,7 +11,8 @@ class CSRF:
         for key in config.keys():
             self.config[key] = config[key]
 
-    def create(self, client_key, server_key=config['SECRET_CSRF_KEY']):
+    def create(self, client_key, server_key=None):
+        server_key = self.config['SECRET_CSRF_KEY'] if server_key is None else server_key
         token = generate_password_hash(client_key + server_key,
                                        method=config['METHOD'],
                                        salt_length=config['SALT_LENGTH'])
@@ -19,13 +20,14 @@ class CSRF:
         return token
 
 
-    def verify(self, client_key, csrf_token,
-               server_key=config['SECRET_CSRF_KEY']):
+    def verify(self, client_key, csrf_token, server_key=None):
+        server_key = self.config['SECRET_CSRF_KEY'] if server_key is None else server_key
         return check_password_hash(config['METHOD'] + '$' + csrf_token,
                                    client_key + server_key)
 
 
-    def csrf_html(self, csrf_token, elem_name=config['HTML_ELEM_NAME']):
+    def csrf_html(self, csrf_token, elem_name=None):
+        elem_name = self.config['HTML_ELEM_NAME'] if elem_name is None else elem_name
         return '<input type="hidden" value="%s" name="%s">' % (csrf_token,
                                                                elem_name)
 

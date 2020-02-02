@@ -7,7 +7,7 @@ with open('README.md', 'r') as r:
 
 setup(
     name='flask-simple-csrf',
-    version='1.1.0',
+    version='1.1.1',
     description='Extremely simple, "Good Enough" csrf implemention for flask forms, no server side sessions required.',
     long_description=README,
     long_description_content_type='text/markdown',
